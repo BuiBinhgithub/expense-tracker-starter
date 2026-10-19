@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { CATEGORIES } from '../constants'
-import { formatCategory } from '../format'
+import { formatCategory, localDateKey } from '../format'
 
+const MIN_AMOUNT = 0.01;
 const DEFAULT_TYPE = "expense";
 const DEFAULT_CATEGORY = "food";
 const TYPES = ["expense", "income"];
@@ -21,15 +22,19 @@ function TransactionForm({ onAdd }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!description || !amount) return;
+    // Native required/pattern/min block bad input with a message; this is only a backstop.
+    // If the form ever sets noValidate, show an error here instead of returning silently.
+    const trimmed = description.trim();
+    const value = Number(amount);
+    if (!trimmed || !Number.isFinite(value) || value < MIN_AMOUNT) return;
 
     onAdd({
       id: Date.now(),
-      description,
-      amount: Number(amount),
+      description: trimmed,
+      amount: value,
       type,
       category,
-      date: new Date().toISOString().split('T')[0],
+      date: localDateKey(),
     });
     resetForm();
   };
@@ -59,6 +64,10 @@ function TransactionForm({ onAdd }) {
           <input
             type="text"
             placeholder="e.g. Groceries"
+            required
+            // Must contain at least one non-space character.
+            pattern=".*\S.*"
+            title="Description can't be blank"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
@@ -70,8 +79,9 @@ function TransactionForm({ onAdd }) {
             <input
               type="number"
               inputMode="decimal"
-              min="0"
-              step="0.01"
+              min={MIN_AMOUNT}
+              step={MIN_AMOUNT}
+              required
               placeholder="0.00"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}

@@ -1,15 +1,16 @@
-import { formatMoney } from '../format'
+import { formatMoney, roundToCents } from '../format'
+
+const sumAmounts = (transactions, type) => roundToCents(
+  transactions
+    .filter(t => t.type === type)
+    .reduce((sum, t) => sum + t.amount, 0)
+);
 
 function Summary({ transactions }) {
-  const totalIncome = transactions
-    .filter(t => t.type === "income")
-    .reduce((sum, t) => sum + t.amount, 0);
+  const totalIncome = sumAmounts(transactions, "income");
+  const totalExpenses = sumAmounts(transactions, "expense");
 
-  const totalExpenses = transactions
-    .filter(t => t.type === "expense")
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const balance = totalIncome - totalExpenses;
+  const balance = roundToCents(totalIncome - totalExpenses);
   const isOver = balance < 0;
   const [whole, cents] = formatMoney(Math.abs(balance)).split(".");
 
