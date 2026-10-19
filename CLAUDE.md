@@ -28,6 +28,5 @@ No test runner is configured yet.
 
 ## Known quirks
 
-- `amount` is stored as a string (in the seed data and from the number input), but the totals are summed with `reduce((sum, t) => sum + t.amount, 0)`, so they concatenate strings instead of adding numbers.
-- The seed entry "Freelance Work" has `type: "expense"` but `category: "salary"`.
+- `amount` must be a number: the seed data uses numbers and `handleSubmit` converts the input with `Number(amount)`. A string amount would make the `reduce` totals concatenate instead of add.
 - ESLint's `no-unused-vars` ignores names that start with an uppercase letter or `_`.
