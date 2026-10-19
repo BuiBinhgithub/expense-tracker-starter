@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { CATEGORIES } from '../constants'
 
-function TransactionList({ transactions }) {
+function TransactionList({ transactions, onDelete }) {
   const [filterType, setFilterType] = useState("all");
   const [filterCategory, setFilterCategory] = useState("all");
 
@@ -34,11 +34,12 @@ function TransactionList({ transactions }) {
             <th>Description</th>
             <th>Category</th>
             <th>Amount</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           {filteredTransactions.map(t => (
-            <TransactionRow key={t.id} transaction={t} />
+            <TransactionRow key={t.id} transaction={t} onDelete={onDelete} />
           ))}
         </tbody>
       </table>
@@ -46,8 +47,14 @@ function TransactionList({ transactions }) {
   );
 }
 
-function TransactionRow({ transaction }) {
+function TransactionRow({ transaction, onDelete }) {
   const isIncome = transaction.type === "income";
+
+  const handleDelete = () => {
+    if (window.confirm(`Delete "${transaction.description}"?`)) {
+      onDelete(transaction.id);
+    }
+  };
 
   return (
     <tr>
@@ -56,6 +63,9 @@ function TransactionRow({ transaction }) {
       <td>{transaction.category}</td>
       <td className={isIncome ? "income-amount" : "expense-amount"}>
         {isIncome ? "+" : "-"}${transaction.amount}
+      </td>
+      <td>
+        <button className="delete-btn" onClick={handleDelete}>Delete</button>
       </td>
     </tr>
   );
