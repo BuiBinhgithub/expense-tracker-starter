@@ -22,9 +22,14 @@ No test runner is configured yet.
 
 - Stack: React 19 + Vite 7, plain JavaScript (JSX), no TypeScript, no router, no state library, no backend or persistence.
 - `src/main.jsx` mounts `<App />` in `StrictMode`.
-- `src/App.jsx` holds the whole app in one component: seed transaction data, form state, filter state, derived totals (income, expenses, balance), the add-transaction form and the filtered transactions table. State lives only in memory and resets on reload.
+- `src/App.jsx` owns the `transactions` array (seeded from `INITIAL_TRANSACTIONS`) and passes it down; it is the only place transactions are added. State lives only in memory and resets on reload.
+- `src/components/`:
+  - `Summary` computes and renders the income, expenses and balance cards from all transactions.
+  - `TransactionForm` owns its own input state and calls `onAdd(transaction)` with a complete transaction object.
+  - `TransactionList` owns the type/category filter state and renders the filtered table.
+- `src/constants.js` holds `CATEGORIES` and the seed `INITIAL_TRANSACTIONS`.
 - Styling is plain CSS: `src/index.css` (global) and `src/App.css` (component classes such as `.summary-card`, `.income-amount`, `.expense-amount`).
-- Transaction shape: `{ id, description, amount, type: "income" | "expense", category, date: "YYYY-MM-DD" }`. Categories are a hard-coded array in `App.jsx`.
+- Transaction shape: `{ id, description, amount, type: "income" | "expense", category, date: "YYYY-MM-DD" }`. Categories come from `CATEGORIES` in `src/constants.js`.
 
 ## Known quirks
 
