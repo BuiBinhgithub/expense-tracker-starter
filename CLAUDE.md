@@ -24,11 +24,12 @@ No test runner is configured yet.
 - `src/main.jsx` mounts `<App />` in `StrictMode`.
 - `src/App.jsx` owns the `transactions` array (seeded from `INITIAL_TRANSACTIONS`) and passes it down; it is the only place transactions are added or deleted (`addTransaction`, `deleteTransaction`). State lives only in memory and resets on reload.
 - `src/components/`:
-  - `Summary` computes and renders the income, expenses and balance cards from all transactions.
+  - `Summary` computes income, expenses and balance from all transactions and renders the balance headline with a spent-vs-kept bar.
   - `TransactionForm` owns its own input state and calls `onAdd(transaction)` with a complete transaction object.
-  - `TransactionList` owns the type/category filter state and renders the filtered table; each row's Delete button asks for confirmation with `window.confirm`, then calls `onDelete(id)`.
+  - `TransactionList` owns the type/category filter state and renders the filtered table newest first; each row's Delete button asks for confirmation with `window.confirm`, then calls `onDelete(id)`.
 - `src/constants.js` holds `CATEGORIES` and the seed `INITIAL_TRANSACTIONS`.
-- Styling is plain CSS: `src/index.css` (global) and `src/App.css` (component classes such as `.summary-card`, `.income-amount`, `.expense-amount`).
+- `src/format.js` holds the display helpers (`formatMoney`, `formatDate`, `formatCategory`); use them rather than hand-formatting `$` amounts.
+- Styling is plain CSS: `src/index.css` holds the design tokens (CSS custom properties on `:root`) and globals; `src/App.css` holds layout and component classes (`.panel`, `.summary-*`, `.segmented`, `.ledger`, `.income-amount`, `.expense-amount`). Archivo (UI) and Tilt Neon (the balance only) load from Google Fonts in `index.html`. `SpendingChart` repeats the palette colors as JS constants because Recharts takes colors as props.
 - Transaction shape: `{ id, description, amount, type: "income" | "expense", category, date: "YYYY-MM-DD" }`. Categories come from `CATEGORIES` in `src/constants.js`.
 
 ## Known quirks

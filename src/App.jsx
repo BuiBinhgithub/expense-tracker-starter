@@ -19,13 +19,17 @@ function App() {
 
   return (
     <div className="app">
-      <h1>Finance Tracker</h1>
-      <p className="subtitle">Track your income and expenses</p>
+      <header className="app-header">
+        <h1>Finance Tracker</h1>
+      </header>
 
       <Summary transactions={transactions} />
-      <SpendingChart transactions={transactions} />
-      <TransactionForm onAdd={addTransaction} />
-      <TransactionList transactions={transactions} onDelete={deleteTransaction} />
+
+      <main className="workspace">
+        <TransactionForm onAdd={addTransaction} />
+        <TransactionList transactions={transactions} onDelete={deleteTransaction} />
+        <SpendingChart transactions={transactions} />
+      </main>
     </div>
   );
 }

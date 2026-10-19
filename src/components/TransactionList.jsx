@@ -1,49 +1,93 @@
 import { useState } from 'react'
 import { CATEGORIES } from '../constants'
+import { formatCategory, formatDate, formatMoney } from '../format'
+
+const TYPE_FILTERS = [
+  { value: "all", label: "All" },
+  { value: "income", label: "Income" },
+  { value: "expense", label: "Expenses" },
+];
 
 function TransactionList({ transactions, onDelete }) {
   const [filterType, setFilterType] = useState("all");
   const [filterCategory, setFilterCategory] = useState("all");
 
-  const filteredTransactions = transactions.filter(t =>
-    (filterType === "all" || t.type === filterType) &&
-    (filterCategory === "all" || t.category === filterCategory)
-  );
+  const filteredTransactions = transactions
+    .filter(t =>
+      (filterType === "all" || t.type === filterType) &&
+      (filterCategory === "all" || t.category === filterCategory)
+    )
+    .sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+
+  const clearFilters = () => {
+    setFilterType("all");
+    setFilterCategory("all");
+  };
 
   return (
-    <div className="transactions">
-      <h2>Transactions</h2>
-      <div className="filters">
-        <select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
-          <option value="all">All Types</option>
-          <option value="income">Income</option>
-          <option value="expense">Expense</option>
-        </select>
-        <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
-          <option value="all">All Categories</option>
-          {CATEGORIES.map(cat => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </select>
+    <section className="panel transactions" aria-labelledby="transactions-heading">
+      <div className="transactions-header">
+        <h2 id="transactions-heading">Transactions</h2>
+        <div className="filters">
+          <fieldset className="segmented segmented-small">
+            <legend className="visually-hidden">Show</legend>
+            {TYPE_FILTERS.map(f => (
+              <label key={f.value}>
+                <input
+                  type="radio"
+                  name="filter-type"
+                  value={f.value}
+                  checked={filterType === f.value}
+                  onChange={(e) => setFilterType(e.target.value)}
+                />
+                <span>{f.label}</span>
+              </label>
+            ))}
+          </fieldset>
+          <select
+            aria-label="Category"
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+          >
+            <option value="all">All categories</option>
+            {CATEGORIES.map(cat => (
+              <option key={cat} value={cat}>{formatCategory(cat)}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Description</th>
-            <th>Category</th>
-            <th>Amount</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredTransactions.map(t => (
-            <TransactionRow key={t.id} transaction={t} onDelete={onDelete} />
-          ))}
-        </tbody>
-      </table>
-    </div>
+      {filteredTransactions.length === 0 ? (
+        <div className="empty-state">
+          {transactions.length === 0 ? (
+            <p>No transactions yet. Add one to start tracking.</p>
+          ) : (
+            <>
+              <p>No transactions match these filters.</p>
+              <button type="button" className="button-quiet" onClick={clearFilters}>
+                Clear filters
+              </button>
+            </>
+          )}
+        </div>
+      ) : (
+        <table className="ledger">
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Description</th>
+              <th scope="col" className="amount-col">Amount</th>
+              <th scope="col"><span className="visually-hidden">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredTransactions.map(t => (
+              <TransactionRow key={t.id} transaction={t} onDelete={onDelete} />
+            ))}
+          </tbody>
+        </table>
+      )}
+    </section>
   );
 }
 
@@ -58,14 +102,23 @@ function TransactionRow({ transaction, onDelete }) {
 
   return (
     <tr>
-      <td>{transaction.date}</td>
-      <td>{transaction.description}</td>
-      <td>{transaction.category}</td>
-      <td className={isIncome ? "income-amount" : "expense-amount"}>
-        {isIncome ? "+" : "-"}${transaction.amount}
-      </td>
+      <td className="date-cell">{formatDate(transaction.date)}</td>
       <td>
-        <button className="delete-btn" onClick={handleDelete}>Delete</button>
+        <span className="description">{transaction.description}</span>
+        <span className="category">{formatCategory(transaction.category)}</span>
+      </td>
+      <td className={`amount-col ${isIncome ? "income-amount" : "expense-amount"}`}>
+        {isIncome ? "+" : "−"}{formatMoney(transaction.amount)}
+      </td>
+      <td className="action-cell">
+        <button
+          type="button"
+          className="delete-btn"
+          aria-label={`Delete ${transaction.description}`}
+          onClick={handleDelete}
+        >
+          Delete
+        </button>
       </td>
     </tr>
   );

@@ -1,3 +1,21 @@
+:root {
+  --night: #120A2A;
+  --panel: #1D1240;
+  --panel-deep: #140A2C;
+  --line: #3A2A6E;
+  --text: #EFE8FF;
+  --text-soft: #A99BD1;
+  --magenta: #FF3EA5;
+  --cyan: #3EE6FF;
+  --sun: #FFC86B;
+
+  --radius-screen: 20px;
+  --radius-sheet: 12px;
+  --radius-control: 6px;
+
+  color-scheme: dark;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -5,7 +23,44 @@
 }
 
 body {
-  font-family: Arial, sans-serif;
-  background-color: #ffffff;
-  color: #333;
+  font-family: "Archivo", system-ui, sans-serif;
+  font-variation-settings: "wdth" 100;
+  font-size: 15px;
+  line-height: 1.5;
+  background-color: var(--night);
+  background-image: radial-gradient(ellipse 80% 50% at 50% 0%, #2A1258 0%, transparent 70%);
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }

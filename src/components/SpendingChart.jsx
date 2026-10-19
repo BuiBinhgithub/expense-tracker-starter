@@ -7,8 +7,14 @@ import {
   CartesianGrid,
   LabelList,
 } from "recharts";
+import { formatCategory, formatMoney } from "../format";
 
-const BAR_ROW_HEIGHT = 40;
+const BAR_ROW_HEIGHT = 36;
+const TEXT = "#EFE8FF";
+const TEXT_SOFT = "#A99BD1";
+const LINE = "#3A2A6E";
+const MAGENTA = "#FF3EA5";
+const formatWhole = (v) => formatMoney(v).replace(/\.00$/, "");
 
 function SpendingChart({ transactions }) {
   const totals = {};
@@ -23,54 +29,59 @@ function SpendingChart({ transactions }) {
     .sort((a, b) => b.amount - a.amount);
 
   return (
-    <div className="spending-chart">
-      <h2>Spending by Category</h2>
+    <section className="panel spending-chart" aria-labelledby="spending-heading">
+      <h2 id="spending-heading">Where it went</h2>
       {data.length === 0 ? (
-        <p className="empty-chart">No expenses yet.</p>
+        <p className="empty-chart">No expenses yet. Add one to see where your money goes.</p>
       ) : (
         <BarChart
           responsive
           style={{ width: "100%", height: data.length * BAR_ROW_HEIGHT + 40 }}
           data={data}
           layout="vertical"
-          margin={{ top: 0, right: 56, bottom: 0, left: 8 }}
+          margin={{ top: 0, right: 64, bottom: 0, left: 0 }}
         >
-          <CartesianGrid horizontal={false} stroke="#eee" />
+          <CartesianGrid horizontal={false} stroke={LINE} />
           <XAxis
             type="number"
-            tickFormatter={(v) => `$${v}`}
-            tick={{ fontSize: 12, fill: "#888" }}
+            tickFormatter={formatWhole}
+            tick={{ fontSize: 11, fill: TEXT_SOFT }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
             type="category"
             dataKey="category"
-            width={100}
-            tick={{ fontSize: 13, fill: "#333" }}
+            width={92}
+            tickFormatter={formatCategory}
+            tick={{ fontSize: 13, fill: TEXT }}
             axisLine={false}
             tickLine={false}
           />
           <Tooltip
-            formatter={(v) => [`$${v}`, "Spent"]}
-            cursor={{ fill: "#f5f5f5" }}
+            formatter={(v) => [formatMoney(v), "Spent"]}
+            labelFormatter={formatCategory}
+            cursor={{ fill: "#2A1A55" }}
+            contentStyle={{ background: "#140A2C", border: `1px solid ${LINE}`, borderRadius: 6, fontSize: 13 }}
+            labelStyle={{ color: TEXT }}
+            itemStyle={{ color: MAGENTA }}
           />
           <Bar
             dataKey="amount"
-            fill="#c0392b"
-            radius={[0, 4, 4, 0]}
-            barSize={20}
+            fill={MAGENTA}
+            radius={[0, 3, 3, 0]}
+            barSize={14}
           >
             <LabelList
               dataKey="amount"
               position="right"
-              formatter={(v) => `$${v}`}
-              style={{ fontSize: 12, fill: "#333" }}
+              formatter={formatWhole}
+              style={{ fontSize: 12, fill: TEXT, fontVariantNumeric: "tabular-nums" }}
             />
           </Bar>
         </BarChart>
       )}
-    </div>
+    </section>
   );
 }
 

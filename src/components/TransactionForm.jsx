@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { CATEGORIES } from '../constants'
+import { formatCategory } from '../format'
 
 const DEFAULT_TYPE = "expense";
 const DEFAULT_CATEGORY = "food";
+const TYPES = ["expense", "income"];
 
 function TransactionForm({ onAdd }) {
   const [description, setDescription] = useState("");
@@ -33,33 +35,63 @@ function TransactionForm({ onAdd }) {
   };
 
   return (
-    <div className="add-transaction">
-      <h2>Add Transaction</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
-        <select value={type} onChange={(e) => setType(e.target.value)}>
-          <option value="income">Income</option>
-          <option value="expense">Expense</option>
-        </select>
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          {CATEGORIES.map(cat => (
-            <option key={cat} value={cat}>{cat}</option>
+    <section className="panel add-transaction" aria-labelledby="add-heading">
+      <h2 id="add-heading">Add a transaction</h2>
+      <form className="transaction-form" onSubmit={handleSubmit}>
+        <fieldset className="segmented">
+          <legend className="visually-hidden">Type</legend>
+          {TYPES.map(t => (
+            <label key={t}>
+              <input
+                type="radio"
+                name="type"
+                value={t}
+                checked={type === t}
+                onChange={(e) => setType(e.target.value)}
+              />
+              <span>{formatCategory(t)}</span>
+            </label>
           ))}
-        </select>
-        <button type="submit">Add</button>
+        </fieldset>
+
+        <label className="field">
+          <span>Description</span>
+          <input
+            type="text"
+            placeholder="e.g. Groceries"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </label>
+
+        <div className="field-row">
+          <label className="field">
+            <span>Amount</span>
+            <input
+              type="number"
+              inputMode="decimal"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+          </label>
+          <label className="field">
+            <span>Category</span>
+            <select value={category} onChange={(e) => setCategory(e.target.value)}>
+              {CATEGORIES.map(cat => (
+                <option key={cat} value={cat}>{formatCategory(cat)}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <button type="submit" className={`button-primary is-${type}`}>
+          Add {type}
+        </button>
       </form>
-    </div>
+    </section>
   );
 }
 
